@@ -2,28 +2,29 @@ import numpy as np
 
 
 def create_matrix():
-    m_0 = np.matrix([[1, 1 / 2, 5],
-                     [2, 1, 9],
-                     [1 / 5, 1 / 9, 1]])
+    m_0 = np.matrix([[1, 1 / 1.31, 1.4],
+                     [1.31, 1, 1.25],
+                     [1 / 1.4, 1 / 1.25, 1]])
 
-    m_1 = np.matrix([[1, 60 / 78, 60 / 64, 60 / 52],
-                     [78 / 60, 1, 78 / 64, 78 / 52],
-                     [64 / 60, 64 / 78, 1, 64 / 52],
-                     [52 / 60, 52 / 78, 52 / 64, 1]])
+    m_1 = np.matrix([[1, 1 / 1.31, 1, 1.25],
+                     [1.31, 1, 1.25, 1.51],
+                     [1, 1 / 1.25, 1, 1.25],
+                     [1 / 1.25, 1 / 1.51, 1 / 1.25, 1]])
 
-    m_2 = np.matrix([[1, 71 / 73, 71 / 74, 71 / 69],
-                     [73 / 71, 1, 73 / 74, 73 / 69],
-                     [74 / 71, 74 / 73, 1, 74 / 69],
-                     [69 / 71, 69 / 73, 69 / 74, 1]])
+    m_2 = np.matrix([[1, 1, 1, 1],
+                     [1, 1, 1, 1.25],
+                     [1, 1, 1, 1.31],
+                     [1, 1 / 1.25, 1 / 1.31, 1]])
 
-    m_3 = np.matrix([[1, 53 / 80, 53 / 71, 53 / 77],
-                     [80 / 53, 1, 80 / 71, 80 / 77],
-                     [71 / 53, 71 / 80, 1, 71 / 77],
-                     [77 / 53, 77 / 80, 77 / 71, 1]])
+    m_3 = np.matrix([[1, 1 / 1.51, 1 / 1.31, 1 / 1.51],
+                     [1.51, 1, 1.25, 1],
+                     [1.31, 1 / 1.25, 1, 1 / 1.25],
+                     [1.51, 1, 1.25, 1]])
 
     return m_0, m_1, m_2, m_3
 
 
+# maximum eigenvector of the matrix
 def eigen_vector(w_0, a):
     return np.sqrt((a * w_0) / (np.transpose(a) * (1 / w_0)))
 
@@ -70,7 +71,9 @@ def consistency_relation(w, a):
 def find_best_changes(w, a):
     n = np.size(a, 0)
     alpha = np.matrix(
-        [[i for i in range(1, n * n + 1)], [i for i in range(1, n * n + 1)], [0 for i in range(1, n * n + 1)]])
+        [[i for i in range(0, n * n)],
+         [i for i in range(0, n * n)],
+         [0 for i in range(0, n * n)]])
     print(alpha)
     for i in range(0, n):
         for j in range(i, n):
@@ -78,12 +81,18 @@ def find_best_changes(w, a):
             alpha[0, l] = i
             alpha[1, l] = j
             alpha[2, l] = (a[i, j] * w[j]) / w[i] + w[i] / (a[i, j] * w[j])
-    l = -np.sort(-alpha[2, :])
-    print(l)
-    alpha[0, :] = alpha[0, l - 1]
-    alpha[1, :] = alpha[1, l - 1]
-    alpha[2, :] = alpha[2, l - 1]
+    sort(alpha)
     return alpha
+
+
+def sort(matrix):
+    x_size = np.size(matrix, 1)
+    for i in range(0, x_size - 1):
+        for j in range(i + 1, x_size):
+            if matrix[2, i] < matrix[2, j]:
+                matrix[2, i], matrix[1, i], matrix[0, i], matrix[2, j], matrix[1, j], matrix[0, j] = \
+                    matrix[2, j], matrix[1, j], matrix[0, j], matrix[2, i], matrix[1, i], matrix[0, i]
+    return matrix
 
 
 def main():
@@ -105,7 +114,7 @@ def main():
     w = np.transpose(np.concatenate((np.transpose(w_1), np.transpose(w_2), np.transpose(w_3))))
     print('W0 = ', w_0)
     print('W = ', w)
-    res = w * w_0
+    res = w.dot(w_0)
     print('Result = ', res)
 
 
